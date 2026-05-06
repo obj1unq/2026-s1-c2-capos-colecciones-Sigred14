@@ -1,0 +1,80 @@
+import capos.*
+import artefactos.*
+import enemigos.*
+import erethia.*
+import fortalezas.*
+
+describe "Tests de Rolando y los Capos de Erethia" {
+
+   
+
+    test "1.1 y 1.2: Recolección, capacidad y vaciado en el castillo" {
+        rolando.capacidadDeMochila(2)
+        
+        // Encuentra y recolecta
+        rolando.encontrarAtefacto(espadaDelDestino)
+        rolando.encontrarAtefacto(libroDeHechizos)
+        
+        // El tercero no debería entrar
+        assert.throwsException({ rolando.encontrarAtefacto(collarDivino) })
+        assert.equals(#{espadaDelDestino, libroDeHechizos}, rolando.artefactosEnMochila())
+
+        // Llega al castillo y vacía
+        rolando.llegar(castilloDePiedra)
+        assert.equals(#{}, rolando.artefactosEnMochila())
+        assert.that(castilloDePiedra.hayArtefactoEnCaja(espadaDelDestino))
+    }
+
+  
+
+    test "2.1 y 2.2: Poder de pelea y evolución en batalla" {
+        rolando.poderBase(5)
+        rolando.capacidadDeMochila(3)
+        rolando.encontrarAtefacto(espadaDelDestino)      // Aporta 5
+        rolando.encontrarAtefacto(armaduraDeAceroValyrio) // Aporta 6
+        rolando.encontrarAtefacto(collarDivino)          // Aporta 3
+
+        //  19
+        assert.equals(19, rolando.poderDePelea())
+
+        rolando.pelearBatalla()
+        //  18
+        assert.equals(18, rolando.poderDePelea())
+    }
+
+    test "2.2: Libro de Hechizos descarta correctamente" {
+        rolando.poderBase(5)
+        rolando.capacidadDeMochila(1)
+        rolando.encontrarAtefacto(libroDeHechizos)
+
+        
+        assert.equals(9, rolando.poderDePelea())
+
+        rolando.pelearBatalla() // Gasta bendición
+        assert.equals(12, rolando.poderDePelea())
+    }
+
+    
+
+    test "2.3, 2.4 y 2.5: Análisis de enemigos y artefactos fatales" {
+        rolando.poderBase(5)
+        rolando.capacidadDeMochila(3)
+        rolando.encontrarAtefacto(espadaDelDestino) // 5
+        rolando.encontrarAtefacto(armaduraDeAceroValyrio) // 6
+        rolando.encontrarAtefacto(collarDivino) // 3
+        // Poder total = 19
+
+        
+        assert.equals(#{archibaldo, astra}, rolando.enemigosQuePuedeVnece())
+        
+       
+        assert.equals(#{palacioDeMarmol, torreDeMarfil}, rolando.moradasConquistables())
+
+      
+        assert.notThat(rolando.esPoderoso())
+
+        
+        rolando.poderBase(15)
+        assert.that(rolando.hayArtefactoFatal(astra))
+    }
+}
